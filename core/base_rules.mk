@@ -642,6 +642,10 @@ $(j_or_n)-$(h_or_t)-tests $(j_or_n)-tests $(h_or_t)-tests : $(LOCAL_CHECKED_MODU
 endif
 endif
 
+ALL_$(h_or_t)_MODULES := $(ALL_$(h_or_t)_MODULES) $(LOCAL_MODULE)
+ALL_$(h_or_t)_MODULES.$(LOCAL_MODULE).PATH := \
+    $(ALL_$(h_or_t)_MODULES.$(LOCAL_MODULE).PATH) $(LOCAL_PATH)
+
 ###########################################################
 ## NOTICE files
 ###########################################################

@@ -760,3 +760,8 @@ endif
 
 # Make sure export_includes gets generated when you are running mm/mmm
 $(LOCAL_BUILT_MODULE) : | $(export_includes)
+
+ALL_$(h_or_t)_MODULES.$(LOCAL_MODULE).DEPS := \
+    $(LOCAL_SHARED_LIBRARIES) \
+    $(LOCAL_STATIC_LIBRARIES) \
+    $(LOCAL_WHOLE_STATIC_LIBRARIES)

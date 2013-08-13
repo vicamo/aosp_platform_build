@@ -1602,3 +1602,94 @@ include $(sort $(wildcard $(BUILD_SYSTEM)/tasks/*.mk))
 ifneq ($(sdk_repo_goal),)
 include $(TOPDIR)development/build/tools/sdk_repo.mk
 endif
+
+define begin-repo-digraph
+$(hide) echo "digraph {"
+
+endef
+
+define end-repo-digraph
+$(hide) echo "}"
+
+endef
+
+define begin-repo-subgraph
+$(hide) echo "  subgraph \"cluster_$(1)\" {"
+$(hide) echo "    label = \"$(1)\";"
+
+endef
+
+define dump-host-repo-module
+$(hide) echo "    \"$(1)@host\" [label=\"$(1)\",style=filled,fillcolor=blue];"
+
+endef
+
+define dump-target-repo-module
+$(hide) echo "    \"$(1)@target\" [label=\"$(1)\",style=filled,fillcolor=green];"
+
+endef
+
+define dump-repo-module-link
+$(hide) echo "  \"$(1)@$(3)\" -> \"$(2)@$(if $(4),$(4),$(3))\";"
+
+endef
+
+define end-repo-subgraph
+$(hide) echo "  }"
+
+endef
+
+define dump-module-dependency-loop
+$(eval manifest_remote := $(shell cd $(TOP_DIR).repo/manifests; git config branch.default.remote))
+$(eval manifest_url := $(shell cd $(TOP_DIR).repo/manifests; git config remote.$(manifest_remote).url))
+$(eval slash_count := $(shell echo $(manifest_url) | sed s,[^/],,g | wc -m))
+$(eval slash_wanted := $(shell expr $(slash_count) - 2))
+$(eval manifest_base := $(shell echo $(manifest_url) | cut -d/ --fields=-$(slash_wanted)))
+$(foreach h_or_t,host target, \
+  $(foreach module,$(ALL_$(h_or_t)_MODULES), \
+    $(eval all_uniq_pathes := ) \
+    $(eval module_repo := ) \
+    $(foreach path,$(ALL_$(h_or_t)_MODULES.$(module).PATH), \
+      $(if $(filter $(path),$(all_uniq_pathes)),, \
+        $(eval all_uniq_pathes := $(all_uniq_pathes) $(path)) \
+        $(eval repo := $(shell cd $(path); git config remote.aosp.url | sed s,^$(manifest_base)/,,)) \
+        $(if $(filter $(repo),$(module_repo)),, \
+          $(if $(module_repo), \
+            $(error $(h_or_t) module "$(module)" found in multiple repos: $(repo) $(module_repo)) \
+	    , \
+            $(eval module_repo := $(repo)) \
+          ) \
+        ) \
+      ) \
+    ) \
+    $(if $(filter $(module_repo),$(ALL_REPOS)),, \
+      $(eval ALL_REPOS := $(ALL_REPOS) $(module_repo)) \
+    ) \
+    $(eval ALL_$(h_or_t)_REPO_MODULES.$(module_repo) := \
+      $(ALL_$(h_or_t)_REPO_MODULES.$(module_repo)) $(module)) \
+  ) \
+)
+$(call begin-repo-digraph)
+$(foreach repo,$(ALL_REPOS), \
+  $(call begin-repo-subgraph,$(repo)) \
+  $(foreach h_or_t,host target, \
+    $(foreach module,$(ALL_$(h_or_t)_REPO_MODULES.$(repo)), \
+      $(call dump-$(h_or_t)-repo-module,$(module)) \
+    ) \
+  ) \
+  $(call end-repo-subgraph) \
+)
+$(foreach h_or_t,host target, \
+  $(foreach module,$(ALL_$(h_or_t)_MODULES), \
+    $(foreach dep,$(ALL_$(h_or_t)_MODULES.$(module).DEPS), \
+      $(if $(filter $(dep),$(ALL_$(h_or_t)_MODULES)), \
+        $(call dump-repo-module-link,$(module),$(dep),$(h_or_t)) \
+      ) \
+    ) \
+  ) \
+)
+$(call end-repo-digraph)
+endef
+
+dump-module-dependency:
+	$(call dump-module-dependency-loop)

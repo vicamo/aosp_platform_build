@@ -473,3 +473,8 @@ $(findbugs_html) : $(findbugs_xml)
 $(LOCAL_MODULE)-findbugs : $(findbugs_html)
 
 endif
+
+ALL_$(h_or_t)_MODULES.$(LOCAL_MODULE).DEPS := \
+    $(LOCAL_JAVA_LIBRARIES) \
+    $(LOCAL_STATIC_JAVA_LIBRARIES) \
+    $(LOCAL_JNI_SHARED_LIBRARIES)

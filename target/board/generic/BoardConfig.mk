@@ -38,6 +38,9 @@ ifeq ($(HOST_OS),linux)
   endif
 endif
 
+# Build emulator binaries
+BUILD_EMULATOR := true
+
 # Build OpenGLES emulation guest and host libraries
 BUILD_EMULATOR_OPENGL := true
 

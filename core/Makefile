@@ -1457,6 +1457,42 @@ systemtarball-nodeps: $(FS_GET_STATS) \
 .PHONY: stnod
 stnod: systemtarball-nodeps
 
+#######
+## system root tarball
+define build-systemroottarball-target
+  $(call pretty,"Target system-root fs tarball: $(INSTALLED_SYSTEMROOTTARBALL_TARGET)")
+  $(call create-system-vendor-symlink)
+  $(hide) [ ! -e "$(PRIVATE_INTERMEDIATES_DIR)" ] || rm -rf "$(PRIVATE_INTERMEDIATES_DIR)"; \
+    [ -d "$(dir $(PRIVATE_INTERMEDIATES_DIR))" ] || mkdir -p "$(dir $(PRIVATE_INTERMEDIATES_DIR))"; \
+    cp -a "$(TARGET_ROOT_OUT)" "$(PRIVATE_INTERMEDIATES_DIR)"; \
+    rm -rf "$(PRIVATE_INTERMEDIATES_DIR)/system"; \
+    cp -a "$(TARGET_OUT)" "$(PRIVATE_INTERMEDIATES_DIR)"
+  $(MKTARBALL) $(FS_GET_STATS) \
+    $(PRIVATE_INTERMEDIATES_DIR) . $(PRIVATE_SYSTEM_ROOT_TAR) \
+    $(INSTALLED_SYSTEMROOTTARBALL_TARGET) $(TARGET_OUT)
+endef
+
+ifndef SYSTEM_ROOT_TARBALL_FORMAT
+    SYSTEM_ROOT_TARBALL_FORMAT := bz2
+endif
+
+intermediates := $(call intermediates-dir-for,PACKAGING,systemroottarball)
+system_root_tar := $(PRODUCT_OUT)/system-root.tar
+INSTALLED_SYSTEMROOTTARBALL_TARGET := $(system_root_tar).$(SYSTEM_ROOT_TARBALL_FORMAT)
+$(INSTALLED_SYSTEMROOTTARBALL_TARGET): PRIVATE_SYSTEM_ROOT_TAR := $(system_root_tar)
+$(INSTALLED_SYSTEMROOTTARBALL_TARGET): PRIVATE_INTERMEDIATES_DIR := $(intermediates)
+$(INSTALLED_SYSTEMROOTTARBALL_TARGET): $(FS_GET_STATS) \
+                      $(INTERNAL_RAMDISK_FILES) $(INTERNAL_SYSTEMIMAGE_FILES)
+	$(build-systemroottarball-target)
+
+.PHONY: systemroottarball-nodeps
+systemroottarball-nodeps: $(FS_GET_STATS) \
+                      $(filter-out systemroottarball-nodeps srtnod,$(MAKECMDGOALS))
+	$(build-systemroottarball-target)
+
+.PHONY: srtnod
+srtnod: systemroottarball-nodeps
+
 # -----------------------------------------------------------------
 ## platform.zip: system, plus other files to be used in PDK fusion build,
 ## in a zip file

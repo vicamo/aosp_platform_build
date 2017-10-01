@@ -869,6 +869,7 @@ dont_bother_goals := clean clobber dataclean installclean \
     help out \
     snod systemimage-nodeps \
     stnod systemtarball-nodeps \
+    srtnod systemroottarball-nodeps \
     userdataimage-nodeps userdatatarball-nodeps \
     cacheimage-nodeps \
     bptimage-nodeps \

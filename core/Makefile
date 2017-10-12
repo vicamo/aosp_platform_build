@@ -1493,6 +1493,29 @@ systemroottarball-nodeps: $(FS_GET_STATS) \
 .PHONY: srtnod
 srtnod: systemroottarball-nodeps
 
+#######
+## system root docker image
+define build-systemrootdockerimage-target
+  $(call pretty,"Target system-root docker image: $(PRIVATE_DOCKER_IMAGE)")
+  $(hide) [ ! -d "$(PRIVATE_INTERMEDIATES_DIR)" ] || rm -rf "$(PRIVATE_INTERMEDIATES_DIR)"; \
+    mkdir -p "$(PRIVATE_INTERMEDIATES_DIR)"; \
+    cp -f $< "$(PRIVATE_INTERMEDIATES_DIR)"; \
+    cd "$(PRIVATE_INTERMEDIATES_DIR)"; \
+    echo "FROM scratch" > Dockerfile; \
+    echo "ADD $(notdir $(INSTALLED_SYSTEMROOTTARBALL_TARGET)) /" >> Dockerfile; \
+    echo "VOLUME /data" >> Dockerfile; \
+    echo "ENTRYPOINT [\"/init\"]" >> Dockerfile; \
+    docker build --tag $(PRIVATE_DOCKER_IMAGE) .
+endef
+
+intermediates := $(call intermediates-dir-for,PACKAGING,systemrootdockerimage)
+
+.PHONY: systemrootdockerimage
+systemrootdockerimage: PRIVATE_DOCKER_IMAGE := $(if $(TARGET_DOCKER_IMAGE),$(TARGET_DOCKER_IMAGE),andocker/$(TARGET_DEVICE):$(TARGET_BUILD_VARIANT)-$(BUILD_ID))
+systemrootdockerimage: PRIVATE_INTERMEDIATES_DIR := $(intermediates)
+systemrootdockerimage: $(INSTALLED_SYSTEMROOTTARBALL_TARGET)
+	$(build-systemrootdockerimage-target)
+
 # -----------------------------------------------------------------
 ## platform.zip: system, plus other files to be used in PDK fusion build,
 ## in a zip file

@@ -28,6 +28,7 @@ rm ${target_tar} > /dev/null 2>&1
 subdirs=`find ${dir_to_tar} -type d -print`
 files=`find ${dir_to_tar} \! -type d -print`
 for f in ${subdirs} ${files} ; do
+    f=${f#./}
     curr_perms=`stat -c 0%a $f`
     [ -d "$f" ] && is_dir=1 || is_dir=0
     new_info=`${fs_get_stats} ${curr_perms} ${is_dir} ${f} ${target_out}`

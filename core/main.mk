@@ -992,6 +992,9 @@ ramdisk: $(INSTALLED_RAMDISK_TARGET)
 .PHONY: systemtarball
 systemtarball: $(INSTALLED_SYSTEMTARBALL_TARGET)
 
+.PHONY: systemroottarball
+systemroottarball: $(INSTALLED_SYSTEMROOTTARBALL_TARGET)
+
 .PHONY: boottarball
 boottarball: $(INSTALLED_BOOTTARBALL_TARGET)
 

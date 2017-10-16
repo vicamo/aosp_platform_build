@@ -63,6 +63,7 @@ $(call add_json_str,  DeviceSecondaryArch,               $(TARGET_2ND_ARCH))
 $(call add_json_str,  DeviceSecondaryArchVariant,        $(TARGET_2ND_ARCH_VARIANT))
 $(call add_json_str,  DeviceSecondaryCpuVariant,         $(TARGET_2ND_CPU_VARIANT))
 $(call add_json_list, DeviceSecondaryAbi,                $(TARGET_2ND_CPU_ABI) $(TARGET_2ND_CPU_ABI2))
+$(call add_json_bool, DeviceIsContainer,                 $(filter true,$(BOARD_IS_CONTAINER)))
 
 $(call add_json_str,  HostArch,                          $(HOST_ARCH))
 $(call add_json_str,  HostSecondaryArch,                 $(HOST_2ND_ARCH))

@@ -889,6 +889,7 @@ endef
 dont_bother_goals := out \
     snod systemimage-nodeps \
     stnod systemtarball-nodeps \
+    srtnod systemroottarball-nodeps \
     userdataimage-nodeps userdatatarball-nodeps \
     cacheimage-nodeps \
     bptimage-nodeps \

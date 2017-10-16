@@ -45,6 +45,7 @@ PARSE_TIME_MAKE_GOALS := \
 	snod \
 	stnod \
 	systemimage-nodeps \
+	systemroottarball-nodeps \
 	systemtarball-nodeps \
 	target-files-package \
 	test-art% \

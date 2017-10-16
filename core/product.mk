@@ -298,6 +298,7 @@ _product_stash_var_list += \
 	BOARD_VENDORIMAGE_PARTITION_SIZE \
 	BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE \
 	BOARD_INSTALLER_CMDLINE \
+	BOARD_IS_CONTAINER \
 
 
 _product_stash_var_list += \
